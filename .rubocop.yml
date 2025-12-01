@@ -1,22 +1,3 @@
-# External.
-
-Style/TrailingBodyOnMethodDefinition:
-  Enabled: false
-
-Layout/IndentationConsistency:
-  Enabled: false
-
-Layout/MultilineBlockLayout:
-  Enabled: false
-
-Style/DefWithParentheses:
-  Enabled: false
-
-Lint/Void:
-  Enabled: false
-
-# Internal:
-
 Style/Documentation:
   Enabled: false
 
@@ -40,3 +21,19 @@ Metrics/PerceivedComplexity:
 
 Metrics/CyclomaticComplexity:
   Max: 10
+
+# Support LowType return value "-> { T }" syntax.
+Style/TrailingBodyOnMethodDefinition:
+  Enabled: false
+Layout/IndentationConsistency:
+  Enabled: false
+Layout/MultilineBlockLayout:
+  Enabled: false
+Style/DefWithParentheses:
+  Enabled: false
+Lint/Void:
+  Enabled: false
+
+# Support Array[]/Hash[] syntax.
+Style/RedundantArrayConstructor:
+  Enabled: false
