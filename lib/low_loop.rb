@@ -28,7 +28,7 @@ module Low
               # puts status, headers, body
 
               # NEXT:
-              #  The goal here is to create events, have an event manager store subscriptions to those events (overvable/observer).
+              #  The goal here is to create RequestEvents, have the EventManager store subscriptions to those events (overvable/observer).
               #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
               #  Good luck
 
