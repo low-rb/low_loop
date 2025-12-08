@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 require 'async'
+require 'socket'
+require 'low_type'
+
+require_relative 'request_parser'
 
 module Low
   class Loop
@@ -20,10 +24,8 @@ module Low
             socket = server.accept
 
             Fiber.schedule do
-              require 'pry'; binding.pry
+              request = RequestParser.parse(socket:)
 
-              # TODO: Use protocol-http where possible, can it parse this request?
-              # request = RequestParser.call(socket)
               # status, headers, body = app.call(request)
               # puts status, headers, body
 

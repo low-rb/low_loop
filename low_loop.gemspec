@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ['maediprichard@gmail.com']
 
   spec.summary = 'An event-driven event loop'
-  spec.description = 'An asynchronous event-driven server that send events from the request layer right through to the application and data layers.'
+  spec.description = 'An asynchronous server that creates events for your event-driven application to use'
   spec.homepage = 'https://github.com/low-rb/low_loop'
   spec.required_ruby_version = '>= 3.3.0'
 
@@ -26,5 +26,8 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
 
   spec.add_dependency 'async'
+  spec.add_dependency 'async-http'
+  spec.add_dependency 'io-stream'
+  spec.add_dependency 'protocol-http'
   spec.add_dependency 'low_type', '~> 1.0'
 end
