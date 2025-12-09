@@ -26,9 +26,6 @@ module Low
             Fiber.schedule do
               request = RequestParser.parse(socket:, host: HOST, port: PORT)
 
-              # status, headers, body = app.call(request)
-              # puts status, headers, body
-
               # NEXT:
               #  The goal here is to create RequestEvents, have the EventManager store subscriptions to those events (overvable/observer).
               #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
