@@ -8,6 +8,10 @@ require_relative 'request_parser'
 
 module Low
   class Loop
+    include Eventable
+
+    observable
+
     PORT = ENV.fetch('PORT', 4133)
     HOST = ENV.fetch('HOST', '127.0.0.1').freeze
 
