@@ -27,9 +27,11 @@ module Low
               request = RequestParser.parse(socket:, host: HOST, port: PORT)
 
               # NEXT:
-              #  The goal here is to create RequestEvents, have the EventManager store subscriptions to those events (overvable/observer).
+              #  The goal here is to create RequestEvents, have the EventManager subscribe to those events (observable/observer/observe).
               #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
               #  Good luck
+
+              request_response = trigger RequestEvent.new(request:)
 
               # HttpResponder.call(socket, status, headers, body)
             rescue => e
