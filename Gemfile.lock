@@ -1,10 +1,17 @@
 PATH
+  remote: ../low_event
+  specs:
+    low_event (0.0.0)
+      low_type (~> 1.0)
+
+PATH
   remote: .
   specs:
     low_loop (0.0.0)
       async
       async-http
       io-stream
+      low_event (~> 0.0)
       low_type (~> 1.0)
       protocol-http
 
@@ -113,6 +120,7 @@ PLATFORMS
   x86_64-darwin-22
 
 DEPENDENCIES
+  low_event!
   low_loop!
   pry
   pry-nav

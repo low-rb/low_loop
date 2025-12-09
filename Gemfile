@@ -5,6 +5,8 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in low_loop.gemspec
 gemspec
 
+gem 'low_event', path: '../low_event'
+
 group :development do
   gem 'pry'
   gem 'pry-nav'
