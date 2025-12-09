@@ -9,16 +9,15 @@ module Low
     include LowType
 
     class << self
-      def parse(socket: TCPSocket)
+      def parse(socket: TCPSocket, host: String, port: Integer)
         stream = IO::Stream(socket)
         protocol = Async::HTTP::Protocol::HTTP.default.protocol_for(stream)
 
         method, full_path, path, query = parse_request(stream:)
         headers = parse_headers(stream:)
+        body = parse_body(stream:, method:, headers:)
 
-        require 'pry'; require 'pry-nav'; binding.pry
-
-        # ::Protocol::HTTP::Request.new(scheme = nil, authority = nil, method = nil, path = nil, version = nil, headers = Headers.new, body = nil, protocol = nil)
+        ::Protocol::HTTP::Request.new('http', "#{host}:#{port}", method, full_path, protocol::VERSION, headers, body)
       end
 
       private
@@ -45,6 +44,12 @@ module Low
         end
 
         ::Protocol::HTTP::Headers.new(fields)
+      end
+
+      def parse_body(stream:, method:, headers:)
+        return nil unless ['POST', 'PUT'].include?(method)
+        
+        stream.read
       end
     end
   end

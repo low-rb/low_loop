@@ -24,7 +24,7 @@ module Low
             socket = server.accept
 
             Fiber.schedule do
-              request = RequestParser.parse(socket:)
+              request = RequestParser.parse(socket:, host: HOST, port: PORT)
 
               # status, headers, body = app.call(request)
               # puts status, headers, body
