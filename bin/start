@@ -2,4 +2,4 @@
 
 require_relative '../lib/low_loop.rb'
 
-Low::Loop.start
+LowLoop.new.start

@@ -3,47 +3,43 @@
 require 'async'
 require 'socket'
 require 'low_type'
+require 'low_event'
 
 require_relative 'request_parser'
 
-module Low
-  class Loop
-    include Eventable
+class LowLoop
+  extend Observers
+  observable
 
-    observable
+  PORT = ENV.fetch('PORT', 4133)
+  HOST = ENV.fetch('HOST', '127.0.0.1').freeze
 
-    PORT = ENV.fetch('PORT', 4133)
-    HOST = ENV.fetch('HOST', '127.0.0.1').freeze
+  def start
+    server = TCPServer.new(HOST, PORT)
+    puts "Server@#{HOST}:#{PORT}"
+    # server.listen(10)
 
-    class << self
-      def start
-        server = TCPServer.new(HOST, PORT)
-        puts "Server@#{HOST}:#{PORT}"
-        # server.listen(10)
+    Fiber.set_scheduler(Async::Scheduler.new)
 
-        Fiber.set_scheduler(Async::Scheduler.new)
+    Fiber.schedule do
+      loop do
+        socket = server.accept
 
         Fiber.schedule do
-          loop do
-            socket = server.accept
+          request = RequestParser.parse(socket:, host: HOST, port: PORT)
 
-            Fiber.schedule do
-              request = RequestParser.parse(socket:, host: HOST, port: PORT)
+          # NEXT:
+          #  The goal here is to create RequestEvents, have the EventManager subscribe to those events (observable/observer/observe).
+          #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
+          #  Good luck
 
-              # NEXT:
-              #  The goal here is to create RequestEvents, have the EventManager subscribe to those events (observable/observer/observe).
-              #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
-              #  Good luck
+          request_response = take RequestEvent.new(request:)
 
-              request_response = trigger RequestEvent.new(request:)
-
-              # HttpResponder.call(socket, status, headers, body)
-            rescue => e
-              puts e.message
-            ensure
-              socket&.close
-            end
-          end
+          # HttpResponder.call(socket, status, headers, body)
+        rescue => e
+          puts e.message
+        ensure
+          socket&.close
         end
       end
     end

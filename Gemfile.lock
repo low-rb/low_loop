@@ -6,6 +6,11 @@ PATH
       observers
 
 PATH
+  remote: ../observers
+  specs:
+    observers (0.0.2)
+
+PATH
   remote: .
   specs:
     low_loop (0.0.0)
@@ -58,7 +63,6 @@ GEM
     low_type (1.1.3)
     method_source (1.1.0)
     metrics (0.15.0)
-    observers (0.0.2)
     parallel (1.27.0)
     parser (3.3.10.0)
       ast (~> 2.4.1)
@@ -124,6 +128,7 @@ PLATFORMS
 DEPENDENCIES
   low_event!
   low_loop!
+  observers!
   pry
   pry-nav
   rack
