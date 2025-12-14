@@ -26,14 +26,14 @@ class LowLoop
         socket = server.accept
 
         Fiber.schedule do
-          request = RequestParser.parse(socket:, host: HOST, port: PORT)
+          request = Low::RequestParser.parse(socket:, host: HOST, port: PORT)
 
           # NEXT:
           #  The goal here is to create RequestEvents, have the EventManager subscribe to those events (observable/observer/observe).
           #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
           #  Good luck
 
-          request_response = take RequestEvent.new(request:)
+          request_response = LowLoop.take Low::RequestEvent.new(request:)
 
           # HttpResponder.call(socket, status, headers, body)
         rescue => e
