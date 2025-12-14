@@ -5,7 +5,9 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in low_loop.gemspec
 gemspec
 
+# Use local gems when in development.
 gem 'low_event', path: '../low_event'
+gem 'observers', path: '../observers'
 
 group :development do
   gem 'pry'
