@@ -4,6 +4,7 @@ require 'async'
 require 'socket'
 require 'low_type'
 require 'low_event'
+require 'observers'
 
 require_relative 'request_parser'
 
@@ -33,7 +34,7 @@ class LowLoop
           #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
           #  Good luck
 
-          request_response = LowLoop.take Low::RequestEvent.new(request:)
+          request_response = LowLoop.take Low::RequestEvent.new(request:, action: :response)
 
           # HttpResponder.call(socket, status, headers, body)
         rescue => e

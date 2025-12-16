@@ -8,7 +8,7 @@ PATH
 PATH
   remote: ../observers
   specs:
-    observers (0.0.2)
+    observers (0.1.0)
 
 PATH
   remote: .
