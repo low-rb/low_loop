@@ -13,9 +13,9 @@ module Low
         stream = IO::Stream(socket)
         protocol = Async::HTTP::Protocol::HTTP.default.protocol_for(stream)
 
-        method, full_path, path, query = parse_request(stream:)
+        method, full_path, = parse_request(stream:)
         headers = parse_headers(stream:)
-        body = parse_body(stream:, method:, headers:)
+        body = parse_body(stream:, method:)
 
         ::Protocol::HTTP::Request.new('http', "#{host}:#{port}", method, full_path, protocol::VERSION, headers, body)
       end
@@ -25,18 +25,18 @@ module Low
       # TODO: Handle namespaced stream type "IO:Stream".
       def parse_request(stream:)
         request_line = stream.gets || raise(StandardError, 'EOF')
-        
+
         method, full_path, _http_version = request_line.strip.split(' ', 3)
         path, query = full_path.split('?', 2)
-        
+
         [method, full_path, path, query]
       end
-      
+
       # TODO: Handle namespaced stream type "IO:Stream".
       def parse_headers(stream:) -> { ::Protocol::HTTP::Headers }
         fields = []
 
-        while (line = stream.gets.strip) do
+        while (line = stream.gets.strip)
           break if line.strip.empty?
 
           key, value = line.split(/:\s/, 2)
@@ -46,9 +46,9 @@ module Low
         ::Protocol::HTTP::Headers.new(fields)
       end
 
-      def parse_body(stream:, method:, headers:)
-        return nil unless ['POST', 'PUT'].include?(method)
-        
+      def parse_body(stream:, method:)
+        return nil unless %w[POST PUT].include?(method)
+
         stream.read
       end
     end

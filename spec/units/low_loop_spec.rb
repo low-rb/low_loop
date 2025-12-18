@@ -12,10 +12,11 @@ RSpec.describe LowLoop do
   let(:request_event) { Low::RequestEvent.new(request:) }
   # TODO: Convert to FactoryBot.
   let(:request) do
-    Protocol::HTTP::Request.new('http', "#{ENV['HOST']}:#{ENV['PORT']}", 'GET', '/front', 'http/1.1', Protocol::HTTP::Headers[["accept", "text/html"]])
+    Protocol::HTTP::Request.new('http', "#{ENV['HOST']}:#{ENV['PORT']}", 'GET', '/front', 'http/1.1',
+                                Protocol::HTTP::Headers[['accept', 'text/html']])
   end
   let(:response_event) { Low::ResponseEvent.new }
-  
+
   before do
     stub_const('ENV', ENV.to_h.merge('PORT' => 4133, 'HOST' => '127.0.0.1'))
     allow(RainRouter).to receive(:handle_event).with(event: request_event).and_return(response_event)
@@ -29,7 +30,7 @@ RSpec.describe LowLoop do
 
   context 'without an event loop' do
     it 'returns a response' do
-      expect(LowLoop.take request_event).to be_instance_of(Low::ResponseEvent)
+      expect(LowLoop.take(request_event)).to be_instance_of(Low::ResponseEvent)
     end
   end
 

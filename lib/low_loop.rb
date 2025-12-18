@@ -20,8 +20,6 @@ class LowLoop
     puts "Server@#{HOST}:#{PORT}"
     # server.listen(10)
 
-    require 'pry'; binding.pry
-
     Fiber.set_scheduler(Async::Scheduler.new)
 
     Fiber.schedule do
@@ -39,7 +37,7 @@ class LowLoop
           request_response = LowLoop.take Low::RequestEvent.new(request:)
 
           # HttpResponder.call(socket, status, headers, body)
-        rescue => e
+        rescue StandardError => e
           puts e.message
         ensure
           socket&.close
