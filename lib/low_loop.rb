@@ -20,6 +20,8 @@ class LowLoop
     puts "Server@#{HOST}:#{PORT}"
     # server.listen(10)
 
+    require 'pry'; binding.pry
+
     Fiber.set_scheduler(Async::Scheduler.new)
 
     Fiber.schedule do
@@ -34,7 +36,7 @@ class LowLoop
           #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
           #  Good luck
 
-          request_response = LowLoop.take Low::RequestEvent.new(request:, action: :response)
+          request_response = LowLoop.take Low::RequestEvent.new(request:)
 
           # HttpResponder.call(socket, status, headers, body)
         rescue => e

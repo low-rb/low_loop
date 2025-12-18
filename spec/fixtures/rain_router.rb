@@ -8,8 +8,7 @@ class RainRouter
   observe LowLoop
 
   class << self
-    def response(event:)
-      event
+    def handle_event(event:)
       # Return value is stubbed.
     end
   end
