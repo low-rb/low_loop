@@ -25,14 +25,15 @@ RSpec.describe LowLoop do
   let(:response) { Low::ResponseFactory.response(body:) }
   let(:body) { 'Hello' }
 
-  let(:host) { "http://#{ENV['HOST']}:#{ENV['PORT']}" }
+  let(:endpoint) { "http://#{host}:#{port}" }
+  let(:host) { '127.0.0.1' }
+  let(:port) { 4133 }
   let(:client) { Async::HTTP::Internet.new }
   # Or could be more direct:
-  # endpoint = Async::HTTP::Endpoint["http://#{ENV['HOST']}:#{ENV['PORT']}"]
+  # endpoint = Async::HTTP::Endpoint["http://#{host}:#{port}"]
   # client = Async::HTTP::Client.new(endpoint)
 
   before do
-    stub_const('ENV', ENV.to_h.merge('HOST' => '127.0.0.1', 'PORT' => 4133))
     allow(RainRouter).to receive(:handle_event).and_return(response_event)
   end
 
@@ -50,29 +51,39 @@ RSpec.describe LowLoop do
 
   context 'with an event loop' do
     before(:all) do
+      config = Struct.new(:host, :port, :matrix_mode, :sleep_duration)
       @server = Thread.new do
-        described_class.new.start
+        described_class.new.start(config: config.new('127.0.0.1', 4133, false, 1))
       end
       sleep 0.1
     end
 
     it 'responds to a request' do
-      expect(Net::HTTP.get_response(URI.parse(host)).body.strip).to eq(body)
+      expect(Net::HTTP.get_response(URI.parse(endpoint)).body.strip).to eq(body)
     end
 
-    # it 'responds to requests asynchronously' do
-    #   duration = Benchmark.measure do
-    #     Async do
-    #       tasks = urls.map do |url|
-    #       Async do
-    #         response = client.get("http://#{ENV['HOST']}:#{ENV['PORT']}/front")
-    #         body = response.read
-    #         response.close
-    #       end
-    #       results = tasks.map(&:result)
-    #     end
-    #   end.real
-    # end
+    context 'with blocking IO' do
+      let(:request_count) { 100 }
+
+      it 'responds to requests asynchronously' do
+        duration = Benchmark.measure do
+          Async do
+            tasks = Array.new(request_count).map do
+              Async do
+                response = client.get(endpoint)
+                body = response.read
+                response.close
+              end
+            end
+
+            results = tasks.map(&:result)
+          end
+        end.real
+
+        expect(RainRouter).to have_received(:handle_event).exactly(request_count).times
+        expect(duration).to be < 1.1
+      end
+    end
 
     after(:all) do
       @server.kill

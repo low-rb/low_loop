@@ -14,13 +14,10 @@ module Low
     extend Observers
     observable
 
-    PORT = ENV.fetch('PORT', 4133)
-    HOST = ENV.fetch('HOST', '127.0.0.1').freeze
-
-    def start
-      server = TCPServer.new(HOST, PORT)
-      puts "Server@#{HOST}:#{PORT}"
-      # server.listen(10)
+    def start(config:)
+      server = TCPServer.new(config.host, config.port)
+      server.listen(10)
+      puts "Server@#{config.host}:#{config.port}" if config.matrix_mode
 
       Fiber.set_scheduler(Async::Scheduler.new)
 
@@ -29,14 +26,16 @@ module Low
           socket = server.accept
 
           Fiber.schedule do
-            request = RequestParser.parse(socket:, host: HOST, port: PORT)
+            sleep config.sleep_duration if config.sleep_duration > 0
+
+            request = RequestParser.parse(socket:, host: config.host, port: config.port)
 
             # NEXT:
             #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
 
             response_event = LowLoop.take RequestEvent.new(request:)
 
-            ResponseBuilder.respond(socket:, response: response_event.response)
+            ResponseBuilder.respond(config:, socket:, response: response_event.response)
           rescue StandardError => e
             puts e.message
           ensure
