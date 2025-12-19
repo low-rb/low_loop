@@ -9,41 +9,45 @@ require 'observers'
 require_relative 'factories/response_factory'
 require_relative 'request_parser'
 
-class LowLoop
-  extend Observers
-  observable
+module Low
+  class Loop
+    extend Observers
+    observable
 
-  PORT = ENV.fetch('PORT', 4133)
-  HOST = ENV.fetch('HOST', '127.0.0.1').freeze
+    PORT = ENV.fetch('PORT', 4133)
+    HOST = ENV.fetch('HOST', '127.0.0.1').freeze
 
-  def start
-    server = TCPServer.new(HOST, PORT)
-    puts "Server@#{HOST}:#{PORT}"
-    # server.listen(10)
+    def start
+      server = TCPServer.new(HOST, PORT)
+      puts "Server@#{HOST}:#{PORT}"
+      # server.listen(10)
 
-    Fiber.set_scheduler(Async::Scheduler.new)
+      Fiber.set_scheduler(Async::Scheduler.new)
 
-    Fiber.schedule do
-      loop do
-        socket = server.accept
+      Fiber.schedule do
+        loop do
+          socket = server.accept
 
-        Fiber.schedule do
-          request = Low::RequestParser.parse(socket:, host: HOST, port: PORT)
+          Fiber.schedule do
+            request = RequestParser.parse(socket:, host: HOST, port: PORT)
 
-          # NEXT:
-          #  The goal here is to create RequestEvents, have the EventManager subscribe to those events (observable/observer/observe).
-          #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
-          #  Good luck
+            # NEXT:
+            #  The goal here is to create RequestEvents, have the EventManager subscribe to those events (observable/observer/observe).
+            #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
+            #  Good luck
 
-          request_response = LowLoop.take Low::RequestEvent.new(request:)
+            request_response = LowLoop.take RequestEvent.new(request:)
 
-          Low::ResponseFactory.response(body: request_response.body)
-        rescue StandardError => e
-          puts e.message
-        ensure
-          socket&.close
+            ResponseFactory.response(body: request_response.body)
+          rescue StandardError => e
+            puts e.message
+          ensure
+            socket&.close
+          end
         end
       end
     end
   end
 end
+
+LowLoop = Low::Loop

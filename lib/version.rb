@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
 module Low
-  module Loop
-    VERSION = '0.0.0'
-  end
+  LOW_LOOP_VERSION = '0.0.0'
 end
