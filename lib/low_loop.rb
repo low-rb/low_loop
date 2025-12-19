@@ -6,6 +6,7 @@ require 'low_type'
 require 'low_event'
 require 'observers'
 
+require_relative 'factories/response_factory'
 require_relative 'request_parser'
 
 class LowLoop
@@ -36,7 +37,7 @@ class LowLoop
 
           request_response = LowLoop.take Low::RequestEvent.new(request:)
 
-          # HttpResponder.call(socket, status, headers, body)
+          Low::ResponseFactory.response(body: request_response.body)
         rescue StandardError => e
           puts e.message
         ensure

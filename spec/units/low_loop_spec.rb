@@ -15,7 +15,7 @@ RSpec.describe LowLoop do
     Protocol::HTTP::Request.new('http', "#{ENV['HOST']}:#{ENV['PORT']}", 'GET', '/front', 'http/1.1',
                                 Protocol::HTTP::Headers[['accept', 'text/html']])
   end
-  let(:response_event) { Low::ResponseEvent.new }
+  let(:response_event) { Low::ResponseEvent.new(body: "Hello") }
 
   before do
     stub_const('ENV', ENV.to_h.merge('PORT' => 4133, 'HOST' => '127.0.0.1'))
