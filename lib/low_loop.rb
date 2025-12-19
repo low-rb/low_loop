@@ -6,8 +6,8 @@ require 'low_type'
 require 'low_event'
 require 'observers'
 
-require_relative 'factories/response_factory'
 require_relative 'request_parser'
+require_relative 'response_builder'
 
 module Low
   class Loop
@@ -32,13 +32,11 @@ module Low
             request = RequestParser.parse(socket:, host: HOST, port: PORT)
 
             # NEXT:
-            #  The goal here is to create RequestEvents, have the EventManager subscribe to those events (observable/observer/observe).
             #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
-            #  Good luck
 
-            request_response = LowLoop.take RequestEvent.new(request:)
+            response_event = LowLoop.take RequestEvent.new(request:)
 
-            ResponseFactory.response(body: request_response.body)
+            ResponseBuilder.respond(socket:, response: response_event.response)
           rescue StandardError => e
             puts e.message
           ensure
