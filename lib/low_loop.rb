@@ -6,6 +6,7 @@ require 'low_type'
 require 'low_event'
 require 'observers'
 
+require_relative 'factories/response_factory'
 require_relative 'request_parser'
 require_relative 'response_builder'
 
@@ -28,12 +29,14 @@ module Low
           Fiber.schedule do
             request = RequestParser.parse(socket:, host: config.host, port: config.port)
 
-            # NEXT:
-            #  Have a RainRouter in between LowLoop and the LowNodes that are subscribed to routes for the RainRouter.
+            if config.mirror_mode
+              response = Low::ResponseFactory.response(body: "Thank you for visiting #{request.path} with '#{request.body}'")
+            else
+              response_event = LowLoop.take RequestEvent.new(request:)
+              response = response_event.response
+            end
 
-            response_event = LowLoop.take RequestEvent.new(request:)
-
-            ResponseBuilder.respond(config:, socket:, response: response_event.response)
+            ResponseBuilder.respond(config:, socket:, response:)
           rescue StandardError => e
             puts e.message
           ensure
