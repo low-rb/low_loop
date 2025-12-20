@@ -26,8 +26,6 @@ module Low
           socket = server.accept
 
           Fiber.schedule do
-            sleep config.sleep_duration if config.sleep_duration > 0
-
             request = RequestParser.parse(socket:, host: config.host, port: config.port)
 
             # NEXT:

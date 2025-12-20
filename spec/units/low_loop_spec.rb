@@ -21,7 +21,10 @@ RSpec.describe LowLoop do
   let(:request_event) { Low::RequestEvent.new(request:) }
   let(:request) { Low::RequestFactory.request(path: '/') }
 
-  let(:response_event) { Low::ResponseEvent.new(response:) }
+  def response_event(response:, delay_duration: 0)
+    sleep delay_duration if delay_duration > 0
+    Low::ResponseEvent.new(response:)
+  end
   let(:response) { Low::ResponseFactory.response(body:) }
   let(:body) { 'Hello' }
 
@@ -34,7 +37,7 @@ RSpec.describe LowLoop do
   # client = Async::HTTP::Client.new(endpoint)
 
   before do
-    allow(RainRouter).to receive(:handle_event).and_return(response_event)
+    allow(RainRouter).to receive(:handle_event).and_return(response_event(response:))
   end
 
   describe '#initialize' do
@@ -51,11 +54,18 @@ RSpec.describe LowLoop do
 
   context 'with an event loop' do
     before(:all) do
-      config = Struct.new(:host, :port, :matrix_mode, :sleep_duration)
+      config = Struct.new(:host, :port, :matrix_mode)
       @server = Thread.new do
-        described_class.new.start(config: config.new('127.0.0.1', 4133, false, 1))
+        described_class.new.start(config: config.new('127.0.0.1', 4133, false))
       end
       sleep 0.1
+    end
+
+    before do
+      # Router needs to delay to mimic IO each time.
+      allow(RainRouter).to receive(:handle_event) do
+        response_event(response:, delay_duration: 1)
+      end
     end
 
     it 'responds to a request' do
