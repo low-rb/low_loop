@@ -9,15 +9,15 @@ module Low
     include LowType
 
     class << self
-      def parse(socket: TCPSocket, host: String, port: Integer)
+      def parse(socket: TCPSocket, host: String, port: Integer) -> { ::Protocol::HTTP::Request }
         stream = IO::Stream(socket)
         protocol = Async::HTTP::Protocol::HTTP.default.protocol_for(stream)
 
-        method, full_path, = parse_request(stream:)
+        method, path, = parse_request(stream:)
         headers = parse_headers(stream:)
         body = parse_body(stream:, method:)
 
-        ::Protocol::HTTP::Request.new('http', "#{host}:#{port}", method, full_path, protocol::VERSION, headers, body)
+        ::Protocol::HTTP::Request.new('http', "#{host}:#{port}", method, path, protocol::VERSION, headers, body)
       end
 
       private
