@@ -22,8 +22,16 @@ module Low
 
       private
 
-      # TODO: Handle namespaced stream type "IO:Stream".
-      def parse_request(stream:)
+      # HTTP Request format:
+      #
+      # :verb :path HTTP/1.1\r\n
+      # :header_1\r\n
+      # :header_2\r\n
+      # :header_3\r\n
+      # \r\n
+      # :body
+      #
+      def parse_request(stream:) # TODO: Handle type for namespaced "IO:Stream".
         request_line = stream.gets || raise(StandardError, 'EOF')
 
         method, full_path, _http_version = request_line.strip.split(' ', 3)
