@@ -3,7 +3,7 @@
 require 'async'
 require 'socket'
 require 'low_type'
-require 'low_event'
+require 'low_event' # TODO: Move RequestEvent and ResponseEvent into this gem.
 require 'observers'
 
 require_relative 'factories/response_factory'

@@ -10,9 +10,9 @@ require 'protocol/http'
 require 'socket'
 
 require 'low_event'
-require_relative '../../lib/factories/request_factory'
 require_relative '../../lib/factories/response_factory'
 require_relative '../../lib/low_loop'
+require_relative '../factories/request_factory'
 require_relative '../fixtures/rain_router'
 
 RSpec.describe LowLoop do
