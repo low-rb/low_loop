@@ -18,14 +18,14 @@ require_relative '../fixtures/rain_router'
 RSpec.describe LowLoop do
   subject(:low_loop) { described_class.new }
 
-  let(:request_event) { Low::RequestEvent.new(request:) }
+  let(:request_event) { Low::Events::RequestEvent.new(request:) }
   let(:request) { Low::RequestFactory.request(path: '/') }
 
   def response_event(response:, delay_duration: 0)
     sleep delay_duration if delay_duration > 0
-    Low::ResponseEvent.new(response:)
+    Low::Events::ResponseEvent.new(response:)
   end
-  let(:response) { Low::ResponseFactory.response(body:) }
+  let(:response) { Low::Events::ResponseFactory.response(body:) }
   let(:body) { 'Hello' }
 
   let(:endpoint) { "http://#{host}:#{port}" }

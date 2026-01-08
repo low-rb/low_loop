@@ -5,7 +5,7 @@ require_relative '../../lib/low_loop'
 
 class RainRouter
   extend Observers
-  observe LowLoop
+  observe LowLoop # TODO: Dependency inject.
 
   class << self
     def handle_event(event:)

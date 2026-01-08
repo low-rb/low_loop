@@ -3,7 +3,7 @@
 require 'async'
 require 'socket'
 require 'low_type'
-require 'low_event' # TODO: Move RequestEvent and ResponseEvent into this gem.
+require 'low_event'
 require 'observers'
 
 require_relative 'factories/response_factory'
@@ -12,8 +12,7 @@ require_relative 'response_builder'
 
 module Low
   class Loop
-    extend Observers
-    observable
+    include Observers
 
     def start(config:)
       server = TCPServer.new(config.host, config.port)
@@ -30,9 +29,9 @@ module Low
             request = RequestParser.parse(socket:, host: config.host, port: config.port)
 
             if config.mirror_mode
-              response = Low::ResponseFactory.response(body: "Thank you for visiting #{request.path} with '#{request.body}'")
+              response = ResponseFactory.response(body: "Thank you for visiting #{request.path} with '#{request.body}'")
             else
-              response_event = LowLoop.take RequestEvent.new(request:)
+              response_event = take(Events::RequestEvent.new(request:))
               response = response_event.response
             end
 
