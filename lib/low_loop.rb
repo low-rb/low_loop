@@ -15,9 +15,8 @@ module Low
     include Observers
 
     def start(config:)
-      server = TCPServer.new(config.host, config.port)
-      server.listen(10)
-      puts "Server@#{config.host}:#{config.port}" if config.matrix_mode
+      server = server(config:)
+      adapter(config:)
 
       Fiber.set_scheduler(Async::Scheduler.new)
 
@@ -27,13 +26,8 @@ module Low
 
           Fiber.schedule do
             request = RequestParser.parse(socket:, host: config.host, port: config.port)
-
-            if config.mirror_mode
-              response = ResponseFactory.response(body: "Thank you for visiting #{request.path} with '#{request.body}'")
-            else
-              response_event = trigger event: Events::RequestEvent.new(request:)
-              response = response_event.response
-            end
+            response_event = trigger event: Events::RequestEvent.new(request:)
+            response = response_event.response
 
             ResponseBuilder.respond(config:, socket:, response:)
           rescue StandardError => e
@@ -43,6 +37,23 @@ module Low
           end
         end
       end
+    end
+
+    def server(config:)
+      server = TCPServer.new(config.host, config.port)
+      server.listen(10)
+      server
+    end
+
+    def adapter(config:)
+      observe self, action: :mirror if config.mirror_mode
+      puts "Server@#{config.host}:#{config.port}" unless config.matrix_mode
+    end
+
+    def mirror(event:)
+      request = event.request
+      response = Low::Events::ResponseFactory.response(body: "Thank you for visiting #{request.path} with body: '#{request.body}'")
+      Low::Events::ResponseEvent.new(response:)
     end
 
     # Consider LowLoop a value object in the context of Observers (there can only be one).
