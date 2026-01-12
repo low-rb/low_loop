@@ -48,7 +48,7 @@ RSpec.describe LowLoop do
 
   context 'without an event loop' do
     it 'responds to a request' do
-      expect(LowLoop.take(request_event)).to be_instance_of(Low::ResponseEvent)
+      expect(low_loop.trigger(event: request_event)).to be_instance_of(Low::Events::ResponseEvent)
     end
   end
 

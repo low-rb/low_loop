@@ -31,7 +31,7 @@ module Low
             if config.mirror_mode
               response = ResponseFactory.response(body: "Thank you for visiting #{request.path} with '#{request.body}'")
             else
-              response_event = take(Events::RequestEvent.new(request:))
+              response_event = trigger event: Events::RequestEvent.new(request:)
               response = response_event.response
             end
 
