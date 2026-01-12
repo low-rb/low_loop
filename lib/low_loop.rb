@@ -44,6 +44,11 @@ module Low
         end
       end
     end
+
+    # Consider LowLoop a value object in the context of Observers (there can only be one).
+    def ==(other) = other.class == self.class
+    def eql?(other) = self == other
+    def hash = [self.class].hash
   end
 end
 
