@@ -8,7 +8,7 @@ LowLoop is an asynchronous event-driven server that ties into [LowEvent](https:/
 
 ```
 bundle install
-LOW_MIRROR_MODE=1 bin/start
+LOW_MIRROR=1 bin/start
 ```
 
 The server will start a demo server in mirror mode, mirroring all of your requests as text in the response.
