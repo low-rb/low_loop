@@ -86,12 +86,12 @@ RSpec.describe LowLoop do
             tasks = Array.new(request_count).map do
               Async do
                 response = client.get(endpoint)
-                body = response.read
+                response.read
                 response.close
               end
             end
 
-            results = tasks.map(&:result)
+            tasks.map(&:result)
           end
         end.real
 

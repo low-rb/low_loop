@@ -31,7 +31,8 @@ module Low
       # \r\n
       # :body
       #
-      def parse_request(stream:) # TODO: Handle type for namespaced "IO:Stream".
+      # TODO: Handle type for namespaced "IO:Stream".
+      def parse_request(stream:)
         request_line = stream.gets || raise(StandardError, 'EOF')
 
         method, full_path, _http_version = request_line.strip.split(' ', 3)

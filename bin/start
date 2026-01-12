@@ -4,9 +4,9 @@
 require_relative '../lib/low_loop'
 
 host = ENV.fetch('LOW_HOST', '127.0.0.1').freeze
-port = ENV.fetch('LOW_PORT', 4133)
-matrix_mode = ENV.fetch('LOW_MATRIX', nil) == '1' ? true : false
-mirror_mode = ENV.fetch('LOW_MIRROR', nil) == '1' ? true : false
+port = ENV.fetch('LOW_PORT', 3000)
+matrix_mode = ENV.fetch('LOW_MATRIX', nil) == '1'
+mirror_mode = ENV.fetch('LOW_MIRROR', nil) == '1'
 
 config = Struct.new(:host, :port, :matrix_mode, :mirror_mode)
 
