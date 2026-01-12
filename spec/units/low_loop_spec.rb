@@ -18,13 +18,10 @@ require_relative '../fixtures/mock_router'
 RSpec.describe LowLoop do
   subject(:low_loop) { described_class.new }
 
+  let(:mock_router) { MockRouter.new(low_loop:) }
+
   let(:request_event) { Low::Events::RequestEvent.new(request:) }
   let(:request) { Low::RequestFactory.request(path: '/') }
-
-  def response_event(response:, delay_duration: 0)
-    sleep delay_duration if delay_duration > 0
-    Low::Events::ResponseEvent.new(response:)
-  end
   let(:response) { Low::Events::ResponseFactory.response(body:) }
   let(:body) { 'Hello' }
 
@@ -36,6 +33,11 @@ RSpec.describe LowLoop do
   # endpoint = Async::HTTP::Endpoint["http://#{host}:#{port}"]
   # client = Async::HTTP::Client.new(endpoint)
 
+  def response_event(response:, delay_duration: 0)
+    sleep delay_duration if delay_duration > 0
+    Low::Events::ResponseEvent.new(response:)
+  end
+
   before do
     allow(mock_router).to receive(:handle).and_return(response_event(response:))
   end
@@ -46,18 +48,21 @@ RSpec.describe LowLoop do
     end
   end
 
-  context 'without an event loop' do
+  context 'without event loop' do
     it 'responds to a request' do
       expect(low_loop.trigger(event: request_event)).to be_instance_of(Low::Events::ResponseEvent)
     end
   end
 
-  context 'with an event loop' do
+  context 'with event loop' do
     before(:all) do
-      config = Struct.new(:host, :port, :matrix_mode)
+      config = Struct.new(:host, :port, :matrix_mode, :mirror_mode)
+
+      # When thread wont die run: `lsof -i :4133` then `kill -9 :pid`
       @server = Thread.new do
-        described_class.new.start(config: config.new('127.0.0.1', 4133, false))
+        described_class.new.start(config: config.new('127.0.0.1', 4133, false, false))
       end
+
       sleep 0.1
     end
 
