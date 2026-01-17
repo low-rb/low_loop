@@ -13,12 +13,19 @@ require 'low_event'
 require_relative '../../lib/factories/response_factory'
 require_relative '../../lib/low_loop'
 require_relative '../factories/request_factory'
-require_relative '../fixtures/mock_router'
+require_relative '../fixtures/router'
 
 RSpec.describe LowLoop do
-  subject(:low_loop) { described_class.new }
+  subject(:low_loop) { described_class.new(config:) }
 
-  let(:mock_router) { MockRouter.new(low_loop:) }
+  let(:config) do
+    config = Struct.new(:host, :port, :matrix_mode, :mirror_mode)
+    config.new('127.0.0.1', 4133, false, false)
+  end
+  let(:router) do
+    # In practice LowLoop observes the router, but because "before(:all)" can't stub ":router" then we inverse the observe.
+    Router.new.tap { |router| router.observe(low_loop) }
+  end
 
   let(:request_event) { Low::Events::RequestEvent.new(request:) }
   let(:request) { Low::RequestFactory.request(path: '/') }
@@ -39,7 +46,7 @@ RSpec.describe LowLoop do
   end
 
   before do
-    allow(mock_router).to receive(:handle).and_return(response_event(response:))
+    allow(router).to receive(:handle).and_return(response_event(response:))
   end
 
   describe '#initialize' do
@@ -58,9 +65,11 @@ RSpec.describe LowLoop do
     before(:all) do
       config = Struct.new(:host, :port, :matrix_mode, :mirror_mode)
 
-      # When thread wont die run: `lsof -i :4133` then `kill -9 :pid`
+      # When thread wont die run:
+      # lsof -i :4133
+      # kill -9 <pid>
       @server = Thread.new do
-        described_class.new.start(config: config.new('127.0.0.1', 4133, false, false))
+        described_class.new(config: config.new('127.0.0.1', 4133, false, false)).start
       end
 
       sleep 0.1
@@ -68,7 +77,7 @@ RSpec.describe LowLoop do
 
     before do
       # Delay response to mimic IO.
-      allow(mock_router).to receive(:handle) do
+      allow(router).to receive(:handle) do
         response_event(response:, delay_duration: 1)
       end
     end
@@ -95,7 +104,7 @@ RSpec.describe LowLoop do
           end
         end.real
 
-        expect(mock_router).to have_received(:handle).exactly(request_count).times
+        expect(router).to have_received(:handle).exactly(request_count).times
         expect(duration).to be < 1.1
       end
     end

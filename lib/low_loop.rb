@@ -14,9 +14,20 @@ module Low
   class Loop
     include Observers
 
-    def start(config:)
-      server = server(config:)
-      adapter(config:)
+    attr_reader :config
+
+    def initialize(config:, router: nil)
+      @config = config
+
+      observers.push(self, action: :mirror) if config.mirror_mode
+      observers << FileServer.new
+      observers << router if router
+    end
+
+    def start
+      puts "Server@#{config.host}:#{config.port}" unless config.matrix_mode
+      server = TCPServer.new(config.host, config.port)
+      server.listen(10)
 
       Fiber.set_scheduler(Async::Scheduler.new)
 
@@ -37,17 +48,6 @@ module Low
           end
         end
       end
-    end
-
-    def server(config:)
-      server = TCPServer.new(config.host, config.port)
-      server.listen(10)
-      server
-    end
-
-    def adapter(config:)
-      observe self, action: :mirror if config.mirror_mode
-      puts "Server@#{config.host}:#{config.port}" unless config.matrix_mode
     end
 
     def mirror(event:)

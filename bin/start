@@ -10,4 +10,4 @@ mirror_mode = ENV.fetch('LOW_MIRROR', nil) == '1'
 
 config = Struct.new(:host, :port, :matrix_mode, :mirror_mode)
 
-LowLoop.new.start(config: config.new(host, port, matrix_mode, mirror_mode))
+LowLoop.new(config: config.new(host, port, matrix_mode, mirror_mode)).start
