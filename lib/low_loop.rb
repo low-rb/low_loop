@@ -37,7 +37,7 @@ module Low
 
           Fiber.schedule do
             request = RequestParser.parse(socket:, host: config.host, port: config.port)
-            response_event = trigger event: Events::RequestEvent.new(request:)
+            response_event = take(event: Events::RequestEvent.new(request:))
             response = response_event.response
 
             ResponseBuilder.respond(config:, socket:, response:)
@@ -52,8 +52,8 @@ module Low
 
     def mirror(event:)
       request = event.request
-      response = Low::Events::ResponseFactory.response(body: "Thank you for visiting #{request.path} with body: '#{request.body}'")
-      Low::Events::ResponseEvent.new(response:)
+      response = Events::ResponseFactory.response(body: "Thank you for visiting #{request.path} with body: '#{request.body}'")
+      Events::ResponseEvent.new(response:)
     end
 
     # Consider LowLoop a value object in the context of Observers (there can only be one).
