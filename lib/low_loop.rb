@@ -7,6 +7,7 @@ require 'low_event'
 require 'observers'
 
 require_relative 'factories/response_factory'
+require_relative 'file_server'
 require_relative 'request_parser'
 require_relative 'response_builder'
 
