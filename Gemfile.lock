@@ -15,7 +15,7 @@ PATH
 PATH
   remote: .
   specs:
-    low_loop (0.2.0)
+    low_loop (0.2.1)
       async
       async-http
       io-stream
