@@ -9,7 +9,7 @@ PATH
 PATH
   remote: ../observers
   specs:
-    observers (0.3.2)
+    observers (0.5.1)
       low_dependency
 
 PATH
