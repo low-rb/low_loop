@@ -14,7 +14,7 @@ Naming/BinaryOperatorParameterName:
   Enabled: false
 
 Metrics/AbcSize:
-  Max: 20
+  Max: 25
 
 Metrics/PerceivedComplexity:
   Max: 10

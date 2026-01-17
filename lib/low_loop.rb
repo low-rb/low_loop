@@ -25,9 +25,7 @@ module Low
     end
 
     def start
-      puts "Server@#{config.host}:#{config.port}" unless config.matrix_mode
-      server = TCPServer.new(config.host, config.port)
-      server.listen(10)
+      server = start_server
 
       Fiber.set_scheduler(Async::Scheduler.new)
 
@@ -48,6 +46,14 @@ module Low
           end
         end
       end
+    end
+
+    def start_server
+      puts "Starting server @ #{config.host}:#{config.port}" unless config.matrix_mode
+
+      server = TCPServer.new(config.host, config.port)
+      server.listen(10)
+      server
     end
 
     def mirror(event:)
