@@ -28,7 +28,7 @@ RSpec.describe LowLoop do
   end
 
   let(:request_event) { Low::Events::RequestEvent.new(request:) }
-  let(:request) { Low::RequestFactory.request(path: '/') }
+  let(:request) { Low::Support::RequestFactory.request(path: '/') }
   let(:response) { Low::Events::ResponseFactory.response(body:) }
   let(:body) { 'Hello' }
 
