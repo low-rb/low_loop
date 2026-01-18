@@ -1,13 +1,28 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'yaml'
+require 'ostruct'
+
 require_relative '../lib/low_loop'
+require_relative '../lib/support/config_support'
 
-host = ENV.fetch('LOW_HOST', '127.0.0.1').freeze
-port = ENV.fetch('LOW_PORT', 3000)
-matrix_mode = ENV.fetch('LOW_MATRIX', nil) == '1'
-mirror_mode = ENV.fetch('LOW_MIRROR', nil) == '1'
+# Override config with your own environment variables.
+config_env = {
+  host: ENV.fetch('LOW_HOST', nil),
+  port: ENV.fetch('LOW_PORT', nil),
+  root: ENV.fetch('LOW_ROOT', nil),
+  matrix_mode: ConfigSupport.parse_boolean(ENV.fetch('LOW_MATRIX', nil)),
+  mirror_mode: ConfigSupport.parse_boolean(ENV.fetch('LOW_MIRROR', nil)),
+}
 
-config = Struct.new(:host, :port, :matrix_mode, :mirror_mode)
+# Override config with your own yaml file.
+config_yaml = YAML.load_file('./config/config.yaml', symbolize_names: true)
 
-LowLoop.new(config: config.new(host, port, matrix_mode, mirror_mode)).start
+config_data = config_yaml.merge(config_env) do |_key, old_value, new_value|
+  new_value.nil? ? old_value : new_value
+end
+
+config = OpenStruct.new(config_data)
+
+LowLoop.new(config:).start
