@@ -20,11 +20,11 @@ class LowLoop
   DEFAULT_KEEP_ALIVE_TIMEOUT = 30
   DEFAULT_REQUEST_TIMEOUT = 10
 
-  attr_reader :config
+  attr_reader :config, :frame
 
   def initialize(config:, router: nil, renderer: nil, show_output: true)
     @config = config
-    @frame = LowFrame.new(renderer:, fps: 10, show_output:)
+    @frame = LowFrame.new(renderer: (renderer if config.matrix_mode), fps: 10, show_output:)
 
     Low::Events::RequestEvent.define do |observers|
       observers << Low::FileServer.new(web_root: config.web_root, content_types: config.content_types)
