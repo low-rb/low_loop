@@ -48,6 +48,7 @@ class LowLoop
       # Request handler.
       loop do
         socket = server.accept
+        socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, true)
 
         task.async do
           handle_connection(socket)
