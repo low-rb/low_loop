@@ -46,4 +46,22 @@ RSpec.describe Low::ResponseBuilder do
       expect(output).to include("cache-control: no-cache\r\n")
     end
   end
+
+  context 'with a buffered body' do
+    let(:response) { response_with([['content-type', 'text/html']], body: 'Hi') }
+
+    it 'writes the status line, headers, and body in a single socket write' do
+      allow(socket).to receive(:write).and_call_original
+
+      respond
+
+      expect(socket).to have_received(:write).exactly(1).time
+    end
+
+    it 'still writes a well-formed response' do
+      respond
+      expect(output).to start_with("HTTP/1.1 200\r\n")
+      expect(output).to end_with("\r\n\r\nHi")
+    end
+  end
 end
