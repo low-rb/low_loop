@@ -115,6 +115,34 @@ RSpec.describe LowLoop do
       end
     end
 
+    context 'with a second process sharing the same port' do
+      let(:response) { Low::Factories::ResponseFactory.html(body: 'Hello') }
+
+      it 'binds without raising EADDRINUSE' do
+        second_server = Thread.new do
+          described_class.new(config: Low::ConfigLoader.load('./spec/fixtures/config.yaml'), router:).start
+        end
+
+        sleep 0.1
+
+        expect(second_server).to be_alive
+      ensure
+        second_server&.kill
+      end
+
+      it 'still serves requests correctly with a second process bound to the same port' do
+        second_server = Thread.new do
+          described_class.new(config: Low::ConfigLoader.load('./spec/fixtures/config.yaml'), router:).start
+        end
+
+        sleep 0.1
+
+        expect(Net::HTTP.get_response(URI.parse(endpoint)).body.strip).to eq('Hello')
+      ensure
+        second_server&.kill
+      end
+    end
+
     after(:all) do
       @server.kill
     end

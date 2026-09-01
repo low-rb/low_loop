@@ -63,8 +63,20 @@ class LowLoop
   def start_server
     puts "Starting server @ #{config.host}:#{config.port}" unless config.matrix_mode
 
-    server = TCPServer.new(config.host, config.port)
-    server.listen(10)
+    addrinfo = Addrinfo.tcp(config.host, config.port)
+    raw_socket = Socket.new(addrinfo.afamily, :STREAM, 0)
+    raw_socket.setsockopt(:SOCKET, :REUSEADDR, true)
+    # Lets multiple independent LowLoop processes bind the same host:port; the kernel
+    # load-balances accepted connections across them instead of the 2nd+ process failing
+    # with EADDRINUSE. This is what makes running LowLoop as an N-process cluster possible.
+    raw_socket.setsockopt(:SOCKET, :REUSEPORT, true) if Socket.const_defined?(:SO_REUSEPORT)
+    raw_socket.bind(addrinfo)
+    raw_socket.listen(10)
+
+    # Wrap as a real TCPServer (rather than accepting connections directly off the raw Socket)
+    # so #accept returns TCPSocket instances -- Low::RequestParser.create_stream requires one.
+    server = TCPServer.for_fd(raw_socket.fileno)
+    raw_socket.autoclose = false
     server
   end
 
